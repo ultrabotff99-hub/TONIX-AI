@@ -1,186 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title id="site-title">TONIX AI PRO</title>
-<style>
-:root { --bg: #0a0a0a; --card: #161616; --accent: #3b82f6; --text: #ffffff; }
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-.page { display: none; height: 100%; width: 100%; flex-direction: column; background: var(--bg); }
-.active { display: flex; }
-/* Login Fix */
-#login-page { justify-content: center; align-items: center; padding: 20px; }
-.login-card { background: var(--card); padding: 35px; border-radius: 24px; width: 100%; max-width: 360px; text-align: center; border: 1px solid #222; }
-.login-logo { width: 80px; height: 80px; margin-bottom: 15px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); }
-input, textarea, select { width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px; border: 1px solid #333; background: #000; color: #fff; outline: none; }
-.btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: #fff; font-weight: bold; cursor: pointer; }
-/* Header with Live Stats */
-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1a1a1a; }
-.live-stats { font-size: 10px; color: #00ff00; text-align: right; line-height: 1.2; }
-/* Chat Window */
-#chat-content { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
-.msg { max-width: 85%; font-size: 15px; padding: 12px; border-radius: 15px; line-height: 1.5; }
-.user { align-self: flex-end; background: var(--accent); border-bottom-right-radius: 2px; }
-.ai { align-self: flex-start; background: #1a1a1a; border-bottom-left-radius: 2px; border: 1px solid #333; }
-/* Admin Controls */
-.admin-box { background: #111; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
-.log-item { font-size: 12px; padding: 5px; border-bottom: 1px solid #222; color: #888; }
-.online-dot { height: 8px; width: 8px; background: #00ff00; border-radius: 50%; display: inline-block; margin-right: 5px; }
-/* Sidebar */
-#sidebar { position: fixed; left: -100%; top: 0; height: 100%; width: 280px; background: #111; z-index: 1000; transition: 0.3s; padding: 30px 20px; border-right: 1px solid #222; }
-#sidebar.open { left: 0; }
-.menu-btn { width: 100%; padding: 14px; background: #1a1a1a; border-radius: 10px; color: #fff; border: none; text-align: left; margin-bottom: 10px; cursor: pointer; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="site-title">TONIX AI PRO</title>
+    <style>
+        :root { --bg: #0a0a0a; --card: #161616; --accent: #3b82f6; --text: #ffffff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+        .page { display: none; height: 100%; width: 100%; flex-direction: column; background: var(--bg); }
+        .active { display: flex; }
+        #login-page { justify-content: center; align-items: center; padding: 20px; }
+        .login-card { background: var(--card); padding: 35px; border-radius: 24px; width: 100%; max-width: 400px; text-align: center; border: 1px solid #333; }
+        .login-logo { width: 80px; height: 80px; border-radius: 20px; margin-bottom: 15px; }
+        input { width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px; border: 1px solid #333; background: #000; color: #fff; outline: none; }
+        .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: #fff; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; background: #111; }
+        #chat-content { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .msg { max-width: 85%; font-size: 15px; padding: 12px; border-radius: 15px; line-height: 1.4; position: relative; }
+        .user { align-self: flex-end; background: var(--accent); border-bottom-right-radius: 2px; }
+        .ai { align-self: flex-start; background: #1a1a1a; border-bottom-left-radius: 2px; border: 1px solid #333; }
+        #admin-panel { overflow-y: auto; padding: 20px; }
+        .admin-box { background: #111; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #222; }
+    </style>
 </head>
 <body>
-<div id="app-shell">
-<div id="login-page" class="page active">
-<div class="login-card">
-<img id="display-logo" src="https://cdn.corenexis.com/files/c/7934361720.webp" class="login-logo">
-<h1 id="display-name" style="color: var(--accent);">TONIX AI</h1>
-<p id="display-version" style="color: #666; font-size: 12px; margin-bottom: 15px;">PRO VERSION 1.1</p>
-<input type="email" id="u-mail" placeholder="Email Address">
-<input type="password" id="u-pass" placeholder="Password">
-<button class="btn" onclick="handleLogin()">Login</button>
-</div>
-</div>
-<div id="chat-page" class="page">
-<header>
-<div onclick="toggleSide()" style="cursor:pointer; font-size: 24px;">☰</div>
-<div style="text-align: center;">
-<b id="chat-header-name">TONIX AI</b>
-<div class="live-stats">
-<span id="total-users">Users: 0</span> | <span id="online-users">Online: 1</span>
-</div>
-</div>
-<div style="width: 24px;"></div>
-</header>
-<div id="chat-content">
-<div class="msg ai">System Online. How can I assist you? 🤖</div>
-</div>
-<div style="padding: 15px 20px 30px; background: #000;">
-<div style="background:#1c1c1c; border-radius:30px; padding:5px 18px; display:flex; align-items:center; border:1px solid #333;">
-<input type="text" id="user-msg" style="flex:1; background:transparent; border:none; color:#fff; outline:none; padding:10px;" placeholder="Message..." onkeypress="if(event.key==='Enter') sendMsg()">
-<button onclick="sendMsg()" style="background:none; border:none; color:var(--accent); font-weight:bold;">Send</button>
-</div>
-</div>
-</div>
-<div id="admin-page" class="page" style="padding: 20px; overflow-y: auto;">
-<h2 style="color: var(--accent); margin-bottom: 20px;">Master Control</h2>
-<div class="admin-box">
-<h4>Live Users Log</h4>
-<div id="user-logs" style="max-height: 100px; overflow-y: auto;"></div>
-</div>
-<div class="admin-box">
-<h4>Website Customization</h4>
-<input type="text" id="set-name" placeholder="Change Site Name">
-<input type="text" id="set-ver" placeholder="Change Version (e.g. 1.2)">
-<input type="text" id="set-logo" placeholder="New Logo Image Link">
-<button class="btn" onclick="saveCustomSettings()">Save Appearance</button>
-</div>
-<div class="admin-box">
-<h4>AI Behavior Updates</h4>
-<div id="inst-list"></div>
-<button class="btn" style="background:#222; margin-top:10px;" onclick="addNewInst()">+ Add New Instruction</button>
-<button class="btn" onclick="applyAIUpdates()">Apply AI Changes</button>
-</div>
-<button class="btn" style="background:#222;" onclick="showPage('chat-page')">Exit Admin</button>
-</div>
-<div id="sidebar">
-<h2 style="color: var(--accent); margin-bottom: 25px;">TONIX</h2>
-<button class="menu-btn" onclick="showPage('chat-page')">💬 AI Chat</button>
-<button id="admin-menu-btn" class="menu-btn" style="display:none;" onclick="showPage('admin-page')">🔐 Admin Panel</button>
-<button class="menu-btn" style="color: #ff5555; margin-top: auto;" onclick="location.reload()">Logout</button>
-</div>
-</div>
-<script>
-const API_KEY = "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";
-let isAdmin = false;
-let settings = JSON.parse(localStorage.getItem('t_settings')) || { name: "TONIX AI", ver: "PRO VERSION 1.1", logo: "https://cdn.corenexis.com/files/c/7934361720.webp" };
-let logs = JSON.parse(localStorage.getItem('t_user_logs')) || [];
-let instructions = JSON.parse(localStorage.getItem('t_inst_list')) || ["Use BOLD HEADERS", "Use '+' for points"];
-// Initialize UI
-window.onload = () => {
-document.getElementById('display-name').innerText = settings.name;
-document.getElementById('display-version').innerText = settings.ver;
-document.getElementById('display-logo').src = settings.logo;
-document.getElementById('chat-header-name').innerText = settings.name;
-updateStats();
-};
-function showPage(id) {
-document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-document.getElementById(id).classList.add('active');
-document.getElementById('sidebar').classList.remove('open');
-}
-function handleLogin() {
-const mail = document.getElementById('u-mail').value;
-const pass = document.getElementById('u-pass').value;
-if(mail === "admin@tonix.ai" && pass === "3007") {
-isAdmin = true;
-document.getElementById('admin-menu-btn').style.display = "block";
-}
-logs.push({ mail: mail, time: new Date().toLocaleString(), online: true });
-localStorage.setItem('t_user_logs', JSON.stringify(logs));
-updateStats();
-showPage('chat-page');
-}
-function toggleSide() { document.getElementById('sidebar').classList.toggle('open'); }
-function updateStats() {
-document.getElementById('total-users').innerText = `Users: ${logs.length}`;
-const onlineCount = logs.filter(l => l.online).length;
-document.getElementById('online-users').innerText = `Online: ${onlineCount}`;
-document.getElementById('user-logs').innerHTML = logs.map(l => 
-`<div class="log-item"><span class="online-dot"></span>${l.mail} - ${l.time}</div>`
-).join('');
-}
-function saveCustomSettings() {
-const n = document.getElementById('set-name').value;
-const v = document.getElementById('set-ver').value;
-const l = document.getElementById('set-logo').value;
-if(n) settings.name = n;
-if(v) settings.ver = `PRO VERSION ${v}`;
-if(l) settings.logo = l;
-localStorage.setItem('t_settings', JSON.stringify(settings));
-alert("Settings Updated! Please refresh.");
-location.reload();
-}
-// AI Logic
-function renderInst() {
-document.getElementById('inst-list').innerHTML = instructions.map((ins, idx) => `
-<div style="display:flex; gap:5px; margin-bottom:5px;">
-<input type="text" value="${ins}" onchange="instructions[${idx}]=this.value">
-<button onclick="instructions.splice(${idx},1);renderInst()" style="background:red; border:none; padding:5px; border-radius:5px;">X</button>
-</div>
-`).join('');
-}
-function addNewInst() { instructions.push(""); renderInst(); }
-function applyAIUpdates() { localStorage.setItem('t_inst_list', JSON.stringify(instructions)); alert("AI Behavior Saved!"); }
-async function sendMsg() {
-const input = document.getElementById('user-msg');
-const box = document.getElementById('chat-content');
-const msg = input.value.trim();
-if(!msg) return;
-box.innerHTML += `<div class="msg user">${msg}</div>`;
-input.value = "";
-box.scrollTop = box.scrollHeight;
-try {
-const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-method: "POST",
-headers: { "Authorization": `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-body: JSON.stringify({ 
-model: "llama-3.3-70b-versatile", 
-messages: [{role: "system", content: "You are TONIX AI. " + instructions.join(". ")}, {role: "user", content: msg}] 
-})
-});
-const data = await res.json();
-box.innerHTML += `<div class="msg ai">${data.choices[0].message.content}</div>`;
-box.scrollTop = box.scrollHeight;
-} catch(e) { box.innerHTML += `<div class="msg ai">Connection Error.</div>`; }
-}
-// Admin list pre-render
-renderInst();
-</script>
+
+    <div id="login-page" class="page active">
+        <div class="login-card">
+            <img class="login-logo" src="https://cdn.corenexis.com/files/c/7934361720.webp">
+            <h1 id="display-name">TONIX AI</h1>
+            <p id="display-version" style="color: #666; margin-bottom: 20px;">PRO VERSION 1.1</p>
+            <input type="email" id="u-mail" placeholder="Email Address">
+            <input type="password" id="u-pass" placeholder="Password (Optional for users)">
+            <button class="btn" onclick="handleLogin()">LOGIN</button>
+        </div>
+    </div>
+
+    <div id="chat-page" class="page">
+        <header>
+            <span id="nav-title" style="font-weight: 700;">TONIX AI</span>
+            <div style="font-size: 10px; color: #00ff00; text-align: right;">● LIVE<br><span id="user-count">Checking...</span></div>
+        </header>
+        <div id="chat-content"></div>
+        <div style="padding: 15px; background: #111; display: flex; gap: 10px;">
+            <input type="text" id="user-input" placeholder="Ask Tonix AI..." style="margin:0;">
+            <button class="btn" onclick="askAI()" style="width: 60px; margin:0;">></button>
+        </div>
+    </div>
+
+    <div id="admin-panel" class="page">
+        <header>
+            <span>ADMIN CONTROL</span>
+            <button onclick="location.reload()" style="background:none; border:none; color:red;">Logout</button>
+        </header>
+        <div style="padding: 20px;">
+            <div class="admin-box">
+                <h3>System Settings</h3>
+                <input type="text" id="set-name" placeholder="Website Name">
+                <input type="text" id="set-logo" placeholder="Logo URL">
+                <button class="btn" onclick="saveSettings()">Apply Changes</button>
+            </div>
+            <div class="admin-box">
+                <h3>User Activity</h3>
+                <div id="logs" style="font-size: 12px; color: #888;">No recent logins.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = "gsk_vC..."; // ഇങ്ങനെയുള്ള കീകൾ ഗിറ്റ്‌ഹബ്ബ് ബ്ലോക്ക് ചെയ്യാൻ സാധ്യതയുണ്ട്
+        let settings = { name: "TONIX AI", logo: "https://cdn.corenexis.com/files/c/7934361720.webp" };
+
+        function handleLogin() {
+            const email = document.getElementById('u-mail').value;
+            const pass = document.getElementById('u-pass').value;
+
+            if (email === "admin@tonix.ai" && pass === "3007") {
+                showPage('admin-panel');
+            } else if (email.includes("@")) {
+                showPage('chat-page');
+                logUser(email);
+            } else {
+                alert("Please enter a valid email");
+            }
+        }
+
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function logUser(email) {
+            const logs = document.getElementById('logs');
+            logs.innerHTML = `User ${email} joined at ${new Date().toLocaleTimeString()}<br>` + logs.innerHTML;
+            document.getElementById('user-count').innerText = Math.floor(Math.random() * 10) + 1 + " Online";
+        }
+
+        async function askAI() {
+            const input = document.getElementById('user-input');
+            const chat = document.getElementById('chat-content');
+            if(!input.value) return;
+
+            chat.innerHTML += `<div class="msg user">${input.value}</div>`;
+            const prompt = input.value;
+            input.value = "";
+            chat.scrollTop = chat.scrollHeight;
+
+            // AI Logic here
+            chat.innerHTML += `<div class="msg ai">Thinking...</div>`;
+        }
+
+        function saveSettings() {
+            const newName = document.getElementById('set-name').value;
+            if(newName) {
+                document.getElementById('display-name').innerText = newName;
+                document.getElementById('nav-title').innerText = newName;
+                alert("Settings Updated (This session)");
+            }
+        }
+    </script>
 </body>
-</html>
+  </html>
+  
